@@ -10,19 +10,19 @@ class BleedingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bleedingCategories = [
-      BleedingCategory(
+      const BleedingCategory(
         title: 'Pendarahan Parah',
         description: 'Pendarahan yang memerlukan perhatian medis segera',
         icon: Icons.bloodtype,
-        color: const Color(0xFFE53E3E),
-        route: const SevereBleedingScreen(),
+        color: Color(0xFFE53E3E),
+        route: SevereBleedingScreen(),
       ),
-      BleedingCategory(
+      const BleedingCategory(
         title: 'Pendarahan Kecil',
         description: 'Pendarahan ringan yang dapat ditangani sendiri',
         icon: Icons.healing,
-        color: const Color(0xFFF56565),
-        route: const MinorBleedingScreen(),
+        color: Color(0xFFF56565),
+        route: MinorBleedingScreen(),
       ),
     ];
 
@@ -75,7 +75,7 @@ class BleedingScreen extends StatelessWidget {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(40),
                         border: Border.all(color: Colors.white, width: 2),
                       ),

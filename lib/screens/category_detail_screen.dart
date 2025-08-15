@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../models/first_aid_data.dart';
 import '../services/database_helper.dart';
+import '../models/first_aid_data.dart';
 import 'detail_screen.dart';
 
 class CategoryDetailScreen extends StatefulWidget {
@@ -160,7 +160,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 10,
             offset: const Offset(0, 4),
@@ -199,7 +199,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: _getPriorityColor(item.priority).withOpacity(0.1),
+                        color: _getPriorityColor(item.priority).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
