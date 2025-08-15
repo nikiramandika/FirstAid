@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import '../models/first_aid_data.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -107,6 +108,15 @@ class DetailScreen extends StatelessWidget {
                     item.treatment,
                     Icons.healing,
                     Colors.green.shade400,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildVideoTutorialCard(
+                    context: context,
+                    title: 'Video Tutorial Penanganan',
+                    subtitle: 'Tata cara penanganan yang direkomendasikan',
+                    // Ganti URL ini dengan link video yang relevan (YouTube/Vimeo/etc)
+                    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    accentColor: Colors.green.shade400,
                   ),
                   const SizedBox(height: 24),
                   if (item.warnings.isNotEmpty)
@@ -274,6 +284,146 @@ class DetailScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildVideoTutorialCard({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required String videoUrl,
+    required Color accentColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.1),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.ondemand_video,
+                  color: accentColor,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Stack(
+                children: [
+                  // Placeholder thumbnail area (bisa diganti dengan NetworkImage thumbnail YouTube)
+                  Container(
+                    color: Colors.grey.shade200,
+                    child: Center(
+                      child: Icon(
+                        Icons.play_circle_fill,
+                        color: accentColor,
+                        size: 64,
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () async {
+                          await _openVideoUrl(videoUrl);
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  videoUrl,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () async {
+                  await _openVideoUrl(videoUrl);
+                },
+                icon: Icon(Icons.open_in_new, color: accentColor, size: 18),
+                label: Text(
+                  'Buka',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    color: accentColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openVideoUrl(String url) async {
+    if (await canLaunchUrlString(url)) {
+      await launchUrlString(
+        url,
+        mode: LaunchMode.externalApplication,
+      );
+    }
   }
 
   IconData _getIconForCategory(String category) {
