@@ -134,8 +134,6 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 16),
-                      _buildCategoryIllustration(context),
                     ],
                   ),
                 ),
@@ -151,69 +149,6 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                 ),
               ],
             ),
-    );
-  }
-
-  Widget _buildCategoryIllustration(BuildContext context) {
-    // Ganti path ini dengan ilustrasi HD berwarna senada yang Anda inginkan
-    const String illustrationAsset = 'assets/images/category_illustration_placeholder.png';
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Stack(
-        children: [
-          // Ilustrasi utama (akan fallback ke placeholder card jika asset tidak tersedia)
-          Image.asset(
-            illustrationAsset,
-            height: 160,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                height: 160,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
-                ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.image_outlined,
-                        color: Colors.white70,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Tambahkan ilustrasi kategori (HD)',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-          // Overlay tipis agar warna menyatu dengan tema kategori
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    _getCategoryColor(widget.category).withValues(alpha: 0.05),
-                    _getCategoryColor(widget.category).withValues(alpha: 0.10),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 

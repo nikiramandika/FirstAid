@@ -20,8 +20,9 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'first_aid.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -36,12 +37,21 @@ class DatabaseHelper {
         warnings TEXT,
         symptoms TEXT,
         iconName TEXT,
-        priority INTEGER DEFAULT 1
+        priority INTEGER DEFAULT 1,
+        videoUrl TEXT,
+        illustrationUrl TEXT
       )
     ''');
 
     // Insert initial data
     await _insertInitialData(db);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE first_aid_data ADD COLUMN videoUrl TEXT');
+      await db.execute('ALTER TABLE first_aid_data ADD COLUMN illustrationUrl TEXT');
+    }
   }
 
   Future<void> _insertInitialData(Database db) async {
@@ -56,6 +66,8 @@ class DatabaseHelper {
         'symptoms': '',
         'iconName': 'clean_hands',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       {
         'category': 'Pendarahan',
@@ -66,6 +78,8 @@ class DatabaseHelper {
         'symptoms': 'Darah keluar dari luka, korban mungkin mengalami syok',
         'iconName': 'blood_drop',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       {
         'category': 'Pendarahan',
@@ -76,6 +90,8 @@ class DatabaseHelper {
         'symptoms': 'Luka kecil, pendarahan ringan',
         'iconName': 'bandage',
         'priority': 2,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       
       // Tulang dan Otot
@@ -88,6 +104,8 @@ class DatabaseHelper {
         'symptoms': 'Nyeri/nyeri tekan, pembengkakan, memar, jangkauan gerakan yang tidak wajar, imobilitas, kebisingan/perasaan kisi-kisi, kelainan bentuk, kehilangan daya, shock, tungkai bengkok, luka dengan tulang yang menonjol',
         'iconName': 'bone',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       {
         'category': 'Tulang dan Otot',
@@ -98,6 +116,8 @@ class DatabaseHelper {
         'symptoms': 'Rasa sakit/nyeri yang parah, pembengkakan, memar, kesulitan menggerakkan bagian yang terpengaruh',
         'iconName': 'muscle',
         'priority': 2,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       {
         'category': 'Tulang dan Otot',
@@ -108,6 +128,8 @@ class DatabaseHelper {
         'symptoms': 'Nyeri leher/tulang belakang, pembengkakan, memar, bentuk punggung tidak alami, kontrol anggota tubuh yang buruk, sensasi berkurang/tidak biasa, kesulitan bernapas, kehilangan kontrol usus/kandung kemih',
         'iconName': 'spine',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       
       // Luka Bakar
@@ -120,6 +142,8 @@ class DatabaseHelper {
         'symptoms': 'Kulit kemerahan, lepuh, nyeri, pembengkakan',
         'iconName': 'burn',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       {
         'category': 'Luka Bakar',
@@ -130,6 +154,8 @@ class DatabaseHelper {
         'symptoms': 'Luka bakar pada wajah, bibir, atau mulut',
         'iconName': 'face',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       {
         'category': 'Luka Bakar',
@@ -140,6 +166,8 @@ class DatabaseHelper {
         'symptoms': 'Luka bakar pada tubuh atau mata',
         'iconName': 'eye',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       
       // Cedera Kepala
@@ -152,6 +180,8 @@ class DatabaseHelper {
         'symptoms': 'Pukulan di kepala, sakit kepala, pusing, kehilangan memori, kebingungan',
         'iconName': 'head',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       {
         'category': 'Cedera Kepala',
@@ -162,6 +192,8 @@ class DatabaseHelper {
         'symptoms': 'Sakit kepala meningkat, tidak responsif, pupil tidak sama, kelemahan di satu sisi, muntah, mengantuk',
         'iconName': 'brain',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       {
         'category': 'Cedera Kepala',
@@ -172,6 +204,8 @@ class DatabaseHelper {
         'symptoms': 'Luka/memar kepala, kebocoran cairan hidung/telinga, deformitas',
         'iconName': 'skull',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       
       // Keracunan
@@ -184,6 +218,8 @@ class DatabaseHelper {
         'symptoms': 'Mual, muntah, sakit perut, pusing, kesadaran menurun',
         'iconName': 'poison',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       {
         'category': 'Keracunan',
@@ -194,6 +230,8 @@ class DatabaseHelper {
         'symptoms': 'Kulit kemerahan, terbakar, gatal, lepuh',
         'iconName': 'skin',
         'priority': 2,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       {
         'category': 'Keracunan',
@@ -204,6 +242,8 @@ class DatabaseHelper {
         'symptoms': 'Mual, muntah, pusing, kesadaran menurun, pupil melebar atau menyempit',
         'iconName': 'pill',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       
       // Kejang
@@ -216,6 +256,8 @@ class DatabaseHelper {
         'symptoms': 'Kehilangan kesadaran beberapa detik, gerakan aneh, tidak responsif sementara',
         'iconName': 'seizure',
         'priority': 2,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
       {
         'category': 'Kejang',
@@ -226,6 +268,8 @@ class DatabaseHelper {
         'symptoms': 'Tubuh kaku, jatuh, kesulitan bernapas, rahang terkatup, kehilangan kontrol usus, pulih dalam beberapa menit',
         'iconName': 'epilepsy',
         'priority': 1,
+        'videoUrl': '',
+        'illustrationUrl': '',
       },
     ];
 
@@ -284,5 +328,51 @@ class DatabaseHelper {
       orderBy: 'priority ASC, title ASC',
     );
     return List.generate(maps.length, (i) => FirstAidData.fromMap(maps[i]));
+  }
+
+  Future<int> insertData(FirstAidData data) async {
+    final db = await database;
+    return await db.insert('first_aid_data', data.toMap()..remove('id'));
+  }
+
+  Future<int> updateData(FirstAidData data) async {
+    final db = await database;
+    return await db.update(
+      'first_aid_data',
+      data.toMap()..remove('id'),
+      where: 'id = ?',
+      whereArgs: [data.id],
+    );
+  }
+
+  Future<int> deleteData(int id) async {
+    final db = await database;
+    return await db.delete('first_aid_data', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> upsertData(FirstAidData data) async {
+    final updated = await updateData(data);
+    if (updated == 0) {
+      await dbInsertWithId(data);
+    }
+  }
+
+  Future<void> dbInsertWithId(FirstAidData data) async {
+    final db = await database;
+    await db.insert(
+      'first_aid_data',
+      data.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> replaceAll(List<FirstAidData> list) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      await txn.delete('first_aid_data');
+      for (final item in list) {
+        await txn.insert('first_aid_data', item.toMap());
+      }
+    });
   }
 } 

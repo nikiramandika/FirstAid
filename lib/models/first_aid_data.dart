@@ -10,6 +10,8 @@ class FirstAidData {
   final String symptoms;
   final String iconName;
   final int priority;
+  final String videoUrl;
+  final String illustrationUrl;
 
   FirstAidData({
     required this.id,
@@ -21,6 +23,8 @@ class FirstAidData {
     this.symptoms = '',
     this.iconName = 'medical',
     this.priority = 1,
+    this.videoUrl = '',
+    this.illustrationUrl = '',
   });
 
   Map<String, dynamic> toMap() {
@@ -34,10 +38,16 @@ class FirstAidData {
       'symptoms': symptoms,
       'iconName': iconName,
       'priority': priority,
+      'videoUrl': videoUrl,
+      'illustrationUrl': illustrationUrl,
     };
   }
 
   factory FirstAidData.fromMap(Map<String, dynamic> map) {
+    final dynamic iconNameVal = map['iconName'] ?? map['iconname'] ?? map['icon_name'];
+    final dynamic videoUrlVal = map['videoUrl'] ?? map['videourl'] ?? map['video_url'];
+    final dynamic illustrationUrlVal = map['illustrationUrl'] ?? map['illustrationurl'] ?? map['illustration_url'];
+
     return FirstAidData(
       id: map['id'],
       category: map['category'],
@@ -46,8 +56,10 @@ class FirstAidData {
       treatment: map['treatment'] ?? '',
       warnings: map['warnings'] ?? '',
       symptoms: map['symptoms'] ?? '',
-      iconName: map['iconName'] ?? 'medical',
+      iconName: (iconNameVal ?? 'medical') as String,
       priority: map['priority'] ?? 1,
+      videoUrl: (videoUrlVal ?? '') as String,
+      illustrationUrl: (illustrationUrlVal ?? '') as String,
     );
   }
 }

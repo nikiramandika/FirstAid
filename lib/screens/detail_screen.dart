@@ -80,6 +80,8 @@ class DetailScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  _buildCategoryIllustration(context),
                 ],
               ),
             ),
@@ -286,6 +288,66 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildCategoryIllustration(BuildContext context) {
+    const String illustrationAsset = 'assets/images/category_illustration_placeholder.png';
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Stack(
+        children: [
+          Image.asset(
+            illustrationAsset,
+            height: 160,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                height: 160,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                ),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.image_outlined,
+                        color: Colors.white70,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Tambahkan ilustrasi kategori (HD)',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    _getCategoryColor(item.category).withValues(alpha: 0.05),
+                    _getCategoryColor(item.category).withValues(alpha: 0.10),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildVideoTutorialCard({
     required BuildContext context,
     required String title,
@@ -442,6 +504,25 @@ class DetailScreen extends StatelessWidget {
         return Icons.flash_on;
       default:
         return Icons.medical_services;
+    }
+  }
+
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'Pendarahan':
+        return const Color(0xFFE53E3E);
+      case 'Tulang dan Otot':
+        return const Color(0xFF38B2AC);
+      case 'Luka Bakar':
+        return const Color(0xFF3182CE);
+      case 'Cedera Kepala':
+        return const Color(0xFF6B46C1);
+      case 'Keracunan':
+        return const Color(0xFFDD6B20);
+      case 'Kejang':
+        return const Color(0xFF319795);
+      default:
+        return const Color(0xFF3182CE);
     }
   }
 
