@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/database_helper.dart';
 import 'category_detail_screen.dart';
 import 'search_screen.dart';
+import '../services/remote_service.dart';
+import '../config/remote_config.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,10 +20,14 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> categories = [];
   bool isLoading = true;
 
+  // Mapping dari Supabase categories (jika tersedia)
+  final Map<String, IconData> _categoryIcons = {};
+  final Map<String, Color> _categoryColors = {};
+
   @override
   void initState() {
     super.initState();
-    _loadCategories();
+    _initialize();
     // Set status bar style
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -30,6 +36,85 @@ class _HomeScreenState extends State<HomeScreen> {
         statusBarBrightness: Brightness.dark,
       ),
     );
+  }
+
+  Future<void> _initialize() async {
+    await _syncFromSupabase();
+    // Coba ambil kategori dari Supabase; jika gagal/0 pakai lokal
+    final loadedRemote = await _loadRemoteCategories();
+    if (!loadedRemote) {
+      await _loadCategories();
+    }
+  }
+
+  Future<void> _syncFromSupabase() async {
+    try {
+      // Skip sync if Supabase is not configured yet
+      if (supabaseRestUrl.contains('YOUR_PROJECT') ||
+          supabaseAnonKey == 'YOUR_ANON_PUBLIC_KEY') {
+        return;
+      }
+      final remote = RemoteService();
+      final list = await remote.fetchAll();
+      if (list.isNotEmpty) {
+        await _databaseHelper.replaceAll(list);
+      } else {
+        // Keep existing local data if remote returns empty (e.g., due to RLS)
+        // debug: print message to help diagnose
+        // ignore: avoid_print
+        print('Supabase returned 0 rows; skipped replacing local DB');
+      }
+    } catch (e) {
+      // Ignore sync errors for now; app still works with local data
+      // ignore: avoid_print
+      print('Sync error: $e');
+    }
+  }
+
+  Future<bool> _loadRemoteCategories() async {
+    try {
+      // Jika Supabase belum dikonfigurasi, lewati
+      if (supabaseRestUrl.contains('YOUR_PROJECT') || supabaseAnonKey == 'YOUR_ANON_PUBLIC_KEY') {
+        return false;
+      }
+      final remote = RemoteService();
+      final list = await remote.fetchCategories();
+      if (list.isEmpty) {
+        return false;
+      }
+
+      final List<String> names = [];
+      final Map<String, IconData> icons = {};
+      final Map<String, Color> colors = {};
+
+      for (final Map<String, dynamic> row in list) {
+        final String name = (row['name'] ?? '').toString();
+        if (name.isEmpty) continue;
+        names.add(name);
+        final String? iconName = row['iconName']?.toString();
+        final String? colorStr = row['color']?.toString();
+        icons[name] = _iconFromName(iconName);
+        colors[name] = _colorFromString(colorStr) ?? _getDefaultCategoryColor(name);
+      }
+
+      if (names.isEmpty) return false;
+
+      setState(() {
+        categories = names;
+        _categoryIcons
+          ..clear()
+          ..addAll(icons);
+        _categoryColors
+          ..clear()
+          ..addAll(colors);
+        isLoading = false;
+      });
+      return true;
+    } catch (e) {
+      // ignore: avoid_print
+      print('Load remote categories failed: $e');
+      return false;
+    }
   }
 
   Future<void> _loadCategories() async {
@@ -46,7 +131,64 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Konversi string iconName -> IconData dengan fallback
+  IconData _iconFromName(String? iconName) {
+    final String key = (iconName ?? '').trim().toLowerCase();
+    switch (key) {
+      case 'accessibility':
+        return Icons.accessibility;
+      case 'bloodtype':
+        return Icons.bloodtype;
+      case 'local_fire_department':
+        return Icons.local_fire_department;
+      case 'psychology':
+        return Icons.psychology;
+      case 'warning':
+        return Icons.warning;
+      case 'flash_on':
+        return Icons.flash_on;
+      case 'medical_services':
+        return Icons.medical_services;
+      case 'healing':
+        return Icons.healing;
+      case 'health_and_safety':
+        return Icons.health_and_safety;
+      case 'vaccines':
+        return Icons.vaccines;
+      case 'sick':
+        return Icons.sick;
+      default:
+        return Icons.medical_services;
+    }
+  }
+
+  // Parse color string (#RRGGBB, RRGGBB, #AARRGGBB, AARRGGBB) -> Color
+  Color? _colorFromString(String? value) {
+    if (value == null) return null;
+    var v = value.trim();
+    if (v.isEmpty) return null;
+    // Hapus prefix seperti # atau 0x
+    v = v.replaceAll('#', '').replaceAll('0x', '').replaceAll('0X', '');
+    if (v.length == 6) {
+      v = 'FF$v';
+    }
+    if (v.length != 8) return null;
+    try {
+      final intColor = int.parse(v, radix: 16);
+      return Color(intColor << 0);
+    } catch (_) {
+      return null;
+    }
+  }
+
   Color _getCategoryColor(String category) {
+    // Gunakan warna dari Supabase jika ada
+    final Color? mapped = _categoryColors[category];
+    if (mapped != null) return mapped;
+    return _getDefaultCategoryColor(category);
+  }
+
+  Color _getDefaultCategoryColor(String category) {
     switch (category) {
       case 'Pendarahan':
         return const Color(0xFFE53E3E); // Red
@@ -66,6 +208,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   IconData _getCategoryIcon(String category) {
+    // Gunakan icon dari Supabase jika ada
+    final IconData? mapped = _categoryIcons[category];
+    if (mapped != null) return mapped;
     switch (category) {
       case 'Pendarahan':
         return Icons.bloodtype;
@@ -116,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: const Color(0xFF3182CE), // Blue color
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
@@ -146,9 +291,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF3182CE), // Blue color
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(30),
                     bottomRight: Radius.circular(30),
                   ),
@@ -238,11 +383,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
-                                colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                                colors: [
+                                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+                                  Theme.of(context).colorScheme.primary,
+                                ],
                               ),
                             ),
                           );

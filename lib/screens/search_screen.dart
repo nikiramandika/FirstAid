@@ -461,7 +461,7 @@ class _SearchScreenState extends State<SearchScreen> {
       case 'Kejang':
         return Colors.teal.shade400;
       default:
-        return Colors.blue.shade400;
+        return Colors.red.shade400;
     }
   }
 

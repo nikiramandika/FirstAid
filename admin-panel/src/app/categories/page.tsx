@@ -36,6 +36,7 @@ export default function CategoriesPage() {
           <thead>
             <tr className="text-left text-slate-500">
               <th className="py-3 px-4">Name</th>
+              <th className="py-3 px-4">Icon</th>
               <th className="py-3 px-4">Color</th>
               <th className="py-3 px-4">Actions</th>
             </tr>
@@ -44,6 +45,7 @@ export default function CategoriesPage() {
             {rows.map((r: any, idx: number) => (
               <tr key={r.id} className={idx % 2 ? 'bg-slate-50' : ''}>
                 <td className="py-3 px-4 font-medium">{r.name}</td>
+                <td className="py-3 px-4">{r.iconName || '-'}</td>
                 <td className="py-3 px-4">{r.color || '-'}</td>
                 <td className="py-3 px-4">
                   <Link href={`/categories/edit/${r.id}`} className="text-blue-600 hover:underline">Edit</Link>
@@ -52,7 +54,7 @@ export default function CategoriesPage() {
             ))}
             {!loading && rows.length === 0 && (
               <tr>
-                <td colSpan={3} className="py-6 px-4 text-center text-slate-500">No categories yet</td>
+                <td colSpan={4} className="py-6 px-4 text-center text-slate-500">No categories yet</td>
               </tr>
             )}
           </tbody>

@@ -16,9 +16,16 @@ class FirstAidApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6B46C1),
+          seedColor: const Color(0xFFE53E3E),
           brightness: Brightness.light,
         ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFE53E3E),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: false,
+        ),
+        scaffoldBackgroundColor: Colors.white,
         textTheme: GoogleFonts.poppinsTextTheme(),
         useMaterial3: true,
       ),

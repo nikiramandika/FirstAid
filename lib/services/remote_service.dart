@@ -27,4 +27,22 @@ class RemoteService {
       throw Exception('Failed to fetch data: ${res.statusCode} ${res.body}');
     }
   }
+
+  Future<List<Map<String, dynamic>>> fetchCategories() async {
+    final uri = Uri.parse('$_baseUrl/categories?select=*');
+    final res = await http.get(
+      uri,
+      headers: {
+        'Accept': 'application/json',
+        'apikey': supabaseAnonKey,
+        'Authorization': 'Bearer $supabaseAnonKey',
+      },
+    );
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      final List<dynamic> jsonList = json.decode(res.body) as List<dynamic>;
+      return jsonList.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to fetch categories: ${res.statusCode} ${res.body}');
+    }
+  }
 } 

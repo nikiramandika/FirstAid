@@ -1,26 +1,42 @@
 "use client";
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
+
+const ICON_OPTIONS = [
+  "medical_services",
+  "bloodtype",
+  "accessibility",
+  "local_fire_department",
+  "psychology",
+  "warning",
+  "flash_on",
+];
 
 export default function EditCategory() {
   const router = useRouter();
   const params = useParams();
   const id = Number(params?.id);
 
-  const [name, setName] = useState('');
-  const [color, setColor] = useState('');
+  const [name, setName] = useState("");
+  const [iconName, setIconName] = useState("medical_services");
+  const [color, setColor] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from('categories').select('*').eq('id', id).single();
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .eq("id", id)
+        .single();
       if (error) setError(error.message);
       else {
-        setName(data?.name ?? '');
-        setColor(data?.color ?? '');
+        setName(data?.name ?? "");
+        setIconName(data?.iconName ?? "medical_services");
+        setColor(data?.color ?? "");
       }
       setLoading(false);
     })();
@@ -30,17 +46,25 @@ export default function EditCategory() {
     e.preventDefault();
     setSaving(true);
     setError(null);
-    const { error } = await supabase.from('categories').update({ name, color }).eq('id', id);
+    const { error } = await supabase
+      .from("categories")
+      .update({ name, iconName, color })
+      .eq("id", id);
     setSaving(false);
     if (error) setError(error.message);
-    else router.push('/categories');
+    else router.push("/categories");
   };
 
   const remove = async () => {
-    if (!confirm('Hapus kategori ini? Item yang refer ke nama ini tidak otomatis berubah.')) return;
-    const { error } = await supabase.from('categories').delete().eq('id', id);
+    if (
+      !confirm(
+        "Hapus kategori ini? Item yang refer ke nama ini tidak otomatis berubah."
+      )
+    )
+      return;
+    const { error } = await supabase.from("categories").delete().eq("id", id);
     if (error) setError(error.message);
-    else router.push('/categories');
+    else router.push("/categories");
   };
 
   if (loading) return <p>Loading...</p>;
@@ -49,15 +73,60 @@ export default function EditCategory() {
     <div className="max-w-lg">
       <h2 className="text-xl font-semibold mb-4">Edit Category</h2>
       <form onSubmit={save} className="space-y-3">
-        <input className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-        <input className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Color (optional)" value={color} onChange={(e) => setColor(e.target.value)} />
+        <input
+          className="w-full rounded-lg border border-slate-300 px-3 py-2"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <div>
+          <label className="block mb-1 font-medium">Icon</label>
+          <div className="flex items-center gap-2">
+            <span className="material-icons">{iconName}</span>
+            <select
+              className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              value={iconName}
+              onChange={(e) => setIconName(e.target.value)}
+            >
+              {ICON_OPTIONS.map((i) => (
+                <option key={i} value={i}>
+                  {i}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <input
+          className="w-full rounded-lg border border-slate-300 px-3 py-2"
+          placeholder="Color (optional, e.g. #3182CE)"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+        />
         {error && <p className="text-red-600 text-sm">{error}</p>}
         <div className="flex gap-2">
-          <button disabled={saving} className="px-3 py-2 rounded-lg bg-blue-600 text-white">{saving ? 'Saving...' : 'Save'}</button>
-          <button type="button" onClick={remove} className="px-3 py-2 rounded-lg bg-red-600 text-white">Delete</button>
-          <button type="button" onClick={() => router.push('/categories')} className="px-3 py-2 rounded-lg bg-slate-200">Cancel</button>
+          <button
+            disabled={saving}
+            className="px-3 py-2 rounded-lg bg-blue-600 text-white"
+          >
+            {saving ? "Saving..." : "Save"}
+          </button>
+          <button
+            type="button"
+            onClick={remove}
+            className="px-3 py-2 rounded-lg bg-red-600 text-white"
+          >
+            Delete
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/categories")}
+            className="px-3 py-2 rounded-lg bg-slate-200"
+          >
+            Cancel
+          </button>
         </div>
       </form>
     </div>
   );
-} 
+}

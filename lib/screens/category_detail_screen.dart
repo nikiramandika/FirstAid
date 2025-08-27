@@ -48,7 +48,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       case 'Tulang dan Otot':
         return const Color(0xFF38B2AC); // Teal
       case 'Luka Bakar':
-        return const Color(0xFF3182CE); // Blue
+        return const Color(0xFFE53E3E); // Red
       case 'Cedera Kepala':
         return const Color(0xFF6B46C1); // Purple
       case 'Keracunan':
@@ -56,7 +56,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       case 'Kejang':
         return const Color(0xFF319795); // Teal
       default:
-        return const Color(0xFF3182CE);
+        return const Color(0xFFE53E3E);
     }
   }
 

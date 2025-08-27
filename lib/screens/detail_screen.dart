@@ -94,7 +94,7 @@ class DetailScreen extends StatelessWidget {
                     'Deskripsi',
                     item.description,
                     Icons.info_outline,
-                    Colors.blue.shade400,
+                    Theme.of(context).colorScheme.primary,
                   ),
                   const SizedBox(height: 24),
                   if (item.symptoms.isNotEmpty)
@@ -112,14 +112,14 @@ class DetailScreen extends StatelessWidget {
                     Colors.green.shade400,
                   ),
                   const SizedBox(height: 16),
-                  _buildVideoTutorialCard(
-                    context: context,
-                    title: 'Video Tutorial Penanganan',
-                    subtitle: 'Tata cara penanganan yang direkomendasikan',
-                    // Ganti URL ini dengan link video yang relevan (YouTube/Vimeo/etc)
-                    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                    accentColor: Colors.green.shade400,
-                  ),
+                  if (item.videoUrl.trim().isNotEmpty)
+                    _buildVideoTutorialCard(
+                      context: context,
+                      title: 'Video Tutorial Penanganan',
+                      subtitle: 'Tata cara penanganan yang direkomendasikan',
+                      videoUrl: item.videoUrl.trim(),
+                      accentColor: Colors.green.shade400,
+                    ),
                   const SizedBox(height: 24),
                   if (item.warnings.isNotEmpty)
                     _buildInfoSection(
@@ -291,44 +291,62 @@ class DetailScreen extends StatelessWidget {
   Widget _buildCategoryIllustration(BuildContext context) {
     const String illustrationAsset = 'assets/images/category_illustration_placeholder.png';
 
+    final bool hasNetworkIllustration = item.illustrationUrl.trim().isNotEmpty;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: Stack(
         children: [
-          Image.asset(
-            illustrationAsset,
-            height: 160,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                height: 160,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
-                ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.image_outlined,
-                        color: Colors.white70,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Tambahkan ilustrasi kategori (HD)',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+          if (hasNetworkIllustration)
+            Image.network(
+              item.illustrationUrl,
+              height: 160,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  illustrationAsset,
+                  height: 160,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                );
+              },
+            )
+          else
+            Image.asset(
+              illustrationAsset,
+              height: 160,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  height: 160,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
                   ),
-                ),
-              );
-            },
-          ),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.image_outlined,
+                          color: Colors.white70,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Tambahkan ilustrasi kategori (HD)',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -419,16 +437,29 @@ class DetailScreen extends StatelessWidget {
               aspectRatio: 16 / 9,
               child: Stack(
                 children: [
-                  // Placeholder thumbnail area (bisa diganti dengan NetworkImage thumbnail YouTube)
-                  Container(
-                    color: Colors.grey.shade200,
-                    child: Center(
-                      child: Icon(
-                        Icons.play_circle_fill,
-                        color: accentColor,
-                        size: 64,
-                      ),
-                    ),
+                  // Thumbnail jika URL YouTube valid; fallback ke placeholder abu-abu
+                  Builder(
+                    builder: (context) {
+                      final id = _extractYouTubeId(videoUrl);
+                      if (id != null) {
+                        final thumbUrl = _buildYouTubeThumbnailUrl(id);
+                        return Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image.network(
+                              thumbUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stack) => Container(color: Colors.grey.shade200),
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(color: Colors.grey.shade200);
+                              },
+                            ),
+                          ],
+                        );
+                      }
+                      return Container(color: Colors.grey.shade200);
+                    },
                   ),
                   Positioned.fill(
                     child: Material(
@@ -437,6 +468,16 @@ class DetailScreen extends StatelessWidget {
                         onTap: () async {
                           await _openVideoUrl(videoUrl);
                         },
+                      ),
+                    ),
+                  ),
+                  // Play overlay icon (non-interactive, biar InkWell di bawahnya yang menerima tap)
+                  IgnorePointer(
+                    child: Center(
+                      child: Icon(
+                        Icons.play_circle_fill,
+                        color: accentColor,
+                        size: 64,
                       ),
                     ),
                   ),
@@ -488,6 +529,35 @@ class DetailScreen extends StatelessWidget {
     }
   }
 
+  // Ambil ID YouTube dari berbagai format URL (watch, share, shorts)
+  String? _extractYouTubeId(String url) {
+    try {
+      final uri = Uri.parse(url);
+      if (uri.host.contains('youtube.com')) {
+        if (uri.path == '/watch') {
+          return uri.queryParameters['v'];
+        }
+        if (uri.pathSegments.isNotEmpty && uri.pathSegments.first == 'shorts') {
+          return uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+        }
+        if (uri.pathSegments.isNotEmpty && uri.pathSegments.first == 'embed') {
+          return uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+        }
+      }
+      if (uri.host == 'youtu.be') {
+        return uri.pathSegments.isNotEmpty ? uri.pathSegments.first : null;
+      }
+    } catch (_) {
+      return null;
+    }
+    return null;
+  }
+
+  // Bangun URL thumbnail YouTube (hqdefault)
+  String _buildYouTubeThumbnailUrl(String id) {
+    return 'https://img.youtube.com/vi/$id/hqdefault.jpg';
+  }
+
   IconData _getIconForCategory(String category) {
     switch (category) {
       case 'Pendarahan':
@@ -514,7 +584,7 @@ class DetailScreen extends StatelessWidget {
       case 'Tulang dan Otot':
         return const Color(0xFF38B2AC);
       case 'Luka Bakar':
-        return const Color(0xFF3182CE);
+        return const Color(0xFFE53E3E);
       case 'Cedera Kepala':
         return const Color(0xFF6B46C1);
       case 'Keracunan':
@@ -522,7 +592,7 @@ class DetailScreen extends StatelessWidget {
       case 'Kejang':
         return const Color(0xFF319795);
       default:
-        return const Color(0xFF3182CE);
+        return const Color(0xFFE53E3E);
     }
   }
 
