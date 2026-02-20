@@ -29,7 +29,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
 
   Future<void> _loadCategoryItems() async {
     try {
-      final data = _jsonDataService.getDataByCategory(widget.category);
+      final data = _jsonDataService.items;
       setState(() {
         items = data;
         isLoading = false;

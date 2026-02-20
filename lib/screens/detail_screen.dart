@@ -50,14 +50,14 @@ class DetailScreen extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      _getIconForCategory(item.category),
+                      item.icon,
                       size: 40,
                       color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    item.category,
+                    item.title,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -66,9 +66,11 @@ class DetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: _getPriorityColor(item.priority).withValues(alpha: 0.2),
+                      color: _getPriorityColor(item.priority)
+                          .withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -139,7 +141,8 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoSection(String title, String content, IconData icon, Color color) {
+  Widget _buildInfoSection(
+      String title, String content, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -242,7 +245,7 @@ class DetailScreen extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  'PHC 119',
+                  'Call Center 119',
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -274,7 +277,8 @@ class DetailScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red.shade600,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
@@ -289,7 +293,8 @@ class DetailScreen extends StatelessWidget {
   }
 
   Widget _buildCategoryIllustration(BuildContext context) {
-    const String illustrationAsset = 'assets/images/category_illustration_placeholder.png';
+    const String illustrationAsset =
+        'assets/images/category_illustration_placeholder.png';
 
     final bool hasNetworkIllustration = item.illustrationUrl.trim().isNotEmpty;
 
@@ -354,8 +359,8 @@ class DetailScreen extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    _getCategoryColor(item.category).withValues(alpha: 0.05),
-                    _getCategoryColor(item.category).withValues(alpha: 0.10),
+                    item.color.withValues(alpha: 0.05),
+                    item.color.withValues(alpha: 0.10),
                   ],
                 ),
               ),
@@ -449,8 +454,10 @@ class DetailScreen extends StatelessWidget {
                             Image.network(
                               thumbUrl,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stack) => Container(color: Colors.grey.shade200),
-                              loadingBuilder: (context, child, loadingProgress) {
+                              errorBuilder: (context, error, stack) =>
+                                  Container(color: Colors.grey.shade200),
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
                                 if (loadingProgress == null) return child;
                                 return Container(color: Colors.grey.shade200);
                               },
@@ -558,44 +565,6 @@ class DetailScreen extends StatelessWidget {
     return 'https://img.youtube.com/vi/$id/hqdefault.jpg';
   }
 
-  IconData _getIconForCategory(String category) {
-    switch (category) {
-      case 'Pendarahan':
-        return Icons.bloodtype;
-      case 'Tulang dan Otot':
-        return Icons.accessibility;
-      case 'Luka Bakar':
-        return Icons.local_fire_department;
-      case 'Cedera Kepala':
-        return Icons.psychology;
-      case 'Keracunan':
-        return Icons.warning;
-      case 'Kejang':
-        return Icons.flash_on;
-      default:
-        return Icons.medical_services;
-    }
-  }
-
-  Color _getCategoryColor(String category) {
-    switch (category) {
-      case 'Pendarahan':
-        return const Color(0xFFE53E3E);
-      case 'Tulang dan Otot':
-        return const Color(0xFF38B2AC);
-      case 'Luka Bakar':
-        return const Color(0xFFE53E3E);
-      case 'Cedera Kepala':
-        return const Color(0xFF6B46C1);
-      case 'Keracunan':
-        return const Color(0xFFDD6B20);
-      case 'Kejang':
-        return const Color(0xFF319795);
-      default:
-        return const Color(0xFFE53E3E);
-    }
-  }
-
   Color _getPriorityColor(int priority) {
     switch (priority) {
       case 1:
@@ -617,4 +586,4 @@ class DetailScreen extends StatelessWidget {
         return 'Ringan';
     }
   }
-} 
+}

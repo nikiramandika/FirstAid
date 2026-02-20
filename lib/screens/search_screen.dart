@@ -256,13 +256,12 @@ class _SearchScreenState extends State<SearchScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color:
-                      _getCategoryColor(item.category).withValues(alpha: 0.1),
+                  color: item.color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  _getCategoryIcon(item.category),
-                  color: _getCategoryColor(item.category),
+                  item.icon,
+                  color: item.color,
                   size: 20,
                 ),
               ),
@@ -279,7 +278,7 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                item.category,
+                item.title,
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   color: Colors.grey.shade600,
@@ -387,13 +386,12 @@ class _SearchScreenState extends State<SearchScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color:
-                        _getCategoryColor(item.category).withValues(alpha: 0.1),
+                    color: item.color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
-                    _getCategoryIcon(item.category),
-                    color: _getCategoryColor(item.category),
+                    item.icon,
+                    color: item.color,
                     size: 24,
                   ),
                 ),
@@ -412,7 +410,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        item.category,
+                        item.title,
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           color: Colors.grey.shade600,
@@ -442,22 +440,6 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
     );
-  }
-
-  Color _getCategoryColor(String category) {
-    final cat = _jsonDataService.getCategoryByName(category);
-    if (cat != null) {
-      return cat.getColor();
-    }
-    return Colors.red.shade400;
-  }
-
-  IconData _getCategoryIcon(String category) {
-    final cat = _jsonDataService.getCategoryByName(category);
-    if (cat != null) {
-      return cat.getIcon();
-    }
-    return Icons.medical_services;
   }
 
   @override

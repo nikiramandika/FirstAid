@@ -19,9 +19,11 @@ class JsonDataService {
         await rootBundle.loadString('assets/data/first_aid_data.json');
     _cachedData = json.decode(jsonString);
 
-    _categories = (_cachedData!['categories'] as List)
-        .map((c) => CategoryModel.fromJson(c))
-        .toList();
+    if (_cachedData!['categories'] != null) {
+      _categories = (_cachedData!['categories'] as List)
+          .map((c) => CategoryModel.fromJson(c))
+          .toList();
+    }
 
     _items = (_cachedData!['items'] as List)
         .map((i) => FirstAidData.fromJson(i))
@@ -30,7 +32,7 @@ class JsonDataService {
 
   List<CategoryModel> get categories {
     if (_categories == null) {
-      throw Exception('Data not loaded. Call loadData() first.');
+      return [];
     }
     return _categories!;
   }
@@ -46,8 +48,10 @@ class JsonDataService {
     return categories.map((c) => c.name).toList();
   }
 
-  List<FirstAidData> getDataByCategory(String category) {
-    return items.where((item) => item.category == category).toList();
+  List<FirstAidData> getDataByTitle(String title) {
+    return items
+        .where((item) => item.title.toLowerCase().contains(title.toLowerCase()))
+        .toList();
   }
 
   List<FirstAidData> searchData(String query) {

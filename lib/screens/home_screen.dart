@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/json_data_service.dart';
-import '../models/category_model.dart';
-import 'category_detail_screen.dart';
+import '../models/first_aid_data.dart';
+import 'detail_screen.dart';
 import 'search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,14 +16,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final JsonDataService _jsonDataService = JsonDataService();
   final TextEditingController _searchController = TextEditingController();
-  List<CategoryModel> categories = [];
+  List<FirstAidData> items = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _initialize();
-    // Set status bar style
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -34,14 +33,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _initialize() async {
-    await _loadCategories();
+    await _loadItems();
   }
 
-  Future<void> _loadCategories() async {
+  Future<void> _loadItems() async {
     try {
-      final cats = _jsonDataService.categories;
+      final itms = _jsonDataService.items;
       setState(() {
-        categories = cats;
+        items = itms;
         isLoading = false;
       });
     } catch (e) {
@@ -243,12 +242,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // Categories Section Header (Fixed, tidak ikut scroll)
           SliverPersistentHeader(
             pinned: true,
             delegate: _SliverAppBarDelegate(
-              minHeight: 90,
-              maxHeight: 90,
+              minHeight: 100,
+              maxHeight: 100,
               child: Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -269,14 +267,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: 4,
                             height: 24,
                             decoration: BoxDecoration(
-                              color: const Color(
-                                  0xFFE53E3E), // Red color for variety
+                              color: const Color(0xFFE53E3E),
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'Kategori',
+                            'Bantuan Hidup Dasar',
                             style: GoogleFonts.poppins(
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
@@ -287,14 +284,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Pilih kategori kesehatan untuk melihat informasi lengkap',
+                        'Pilih tindakan pertolongan pertama untuk melihat informasi lengkap',
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           color: Colors.grey.shade600,
                           height: 1.2,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        maxLines: 2,
+                        // overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -303,7 +301,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // Categories Grid (Bisa di-scroll)
           isLoading
               ? const SliverToBoxAdapter(
                   child: Center(
@@ -325,10 +322,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        final category = categories[index];
-                        return _buildCategoryCard(category);
+                        final item = items[index];
+                        return _buildItemCard(item);
                       },
-                      childCount: categories.length,
+                      childCount: items.length,
                     ),
                   ),
                 ),
@@ -342,13 +339,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoryCard(CategoryModel category) {
+  Widget _buildItemCard(FirstAidData item) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CategoryDetailScreen(category: category.name),
+            builder: (context) => DetailScreen(item: item),
           ),
         );
       },
@@ -370,12 +367,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Column(
           children: [
-            // Top colored section
             Container(
               width: double.infinity,
               height: 80,
               decoration: BoxDecoration(
-                color: category.getColor(),
+                color: item.color,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
@@ -383,13 +379,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: Center(
                 child: Icon(
-                  category.getIcon(),
+                  item.icon,
                   size: 32,
                   color: Colors.white,
                 ),
               ),
             ),
-            // Content section
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -397,7 +392,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      category.name,
+                      item.title,
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -409,7 +404,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 8),
                     Expanded(
                       child: Text(
-                        category.description,
+                        item.description,
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           color: Colors.grey.shade600,

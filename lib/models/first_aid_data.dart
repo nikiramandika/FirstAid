@@ -2,41 +2,80 @@ import 'package:flutter/material.dart';
 
 class FirstAidData {
   final int id;
-  final String category;
   final String title;
+  final String iconName;
+  final String colorHex;
   final String description;
   final String treatment;
   final String warnings;
   final String symptoms;
-  final String iconName;
   final int priority;
   final String videoUrl;
   final String illustrationUrl;
 
   FirstAidData({
     required this.id,
-    required this.category,
     required this.title,
+    required this.iconName,
+    required this.colorHex,
     required this.description,
     this.treatment = '',
     this.warnings = '',
     this.symptoms = '',
-    this.iconName = 'medical',
     this.priority = 1,
     this.videoUrl = '',
     this.illustrationUrl = '',
   });
 
+  Color get color {
+    try {
+      return Color(int.parse(colorHex));
+    } catch (e) {
+      return const Color(0xFFEF5350);
+    }
+  }
+
+  IconData get icon {
+    switch (iconName) {
+      case 'emergency':
+        return Icons.emergency;
+      case 'favorite':
+        return Icons.favorite;
+      case 'devices':
+        return Icons.devices;
+      case 'local_fire_department':
+        return Icons.local_fire_department;
+      case 'bloodtype':
+        return Icons.bloodtype;
+      case 'psychology':
+        return Icons.psychology;
+      case 'accessibility_new':
+        return Icons.accessibility_new;
+      case 'pest_control':
+        return Icons.pest_control;
+      case 'bug_report':
+        return Icons.bug_report;
+      case 'air':
+        return Icons.air;
+      case 'restaurant':
+        return Icons.restaurant;
+      case 'sports_gymnastics':
+        return Icons.sports_gymnastics;
+      default:
+        return Icons.medical_services;
+    }
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'category': category,
       'title': title,
+      'icon': iconName,
+      'color': colorHex,
       'description': description,
       'treatment': treatment,
       'warnings': warnings,
       'symptoms': symptoms,
-      'iconName': iconName,
       'priority': priority,
       'videoUrl': videoUrl,
       'illustrationUrl': illustrationUrl,
@@ -44,39 +83,31 @@ class FirstAidData {
   }
 
   factory FirstAidData.fromMap(Map<String, dynamic> map) {
-    final dynamic iconNameVal =
-        map['iconName'] ?? map['iconname'] ?? map['icon_name'];
-    final dynamic videoUrlVal =
-        map['videoUrl'] ?? map['videourl'] ?? map['video_url'];
-    final dynamic illustrationUrlVal = map['illustrationUrl'] ??
-        map['illustrationurl'] ??
-        map['illustration_url'];
-
     return FirstAidData(
       id: map['id'],
-      category: map['category'],
-      title: map['title'],
-      description: map['description'],
+      title: map['title'] ?? '',
+      iconName: map['icon'] ?? map['iconName'] ?? 'medical',
+      colorHex: map['color'] ?? map['colorHex'] ?? '0xFFEF5350',
+      description: map['description'] ?? '',
       treatment: map['treatment'] ?? '',
       warnings: map['warnings'] ?? '',
       symptoms: map['symptoms'] ?? '',
-      iconName: (iconNameVal ?? 'medical') as String,
       priority: map['priority'] ?? 1,
-      videoUrl: (videoUrlVal ?? '') as String,
-      illustrationUrl: (illustrationUrlVal ?? '') as String,
+      videoUrl: map['videoUrl'] ?? '',
+      illustrationUrl: map['illustrationUrl'] ?? '',
     );
   }
 
   factory FirstAidData.fromJson(Map<String, dynamic> json) {
     return FirstAidData(
       id: json['id'] ?? 0,
-      category: json['category'] ?? '',
       title: json['title'] ?? '',
+      iconName: json['icon'] ?? json['iconName'] ?? 'medical',
+      colorHex: json['color'] ?? '0xFFEF5350',
       description: json['description'] ?? '',
       treatment: json['treatment'] ?? '',
       warnings: json['warnings'] ?? '',
       symptoms: json['symptoms'] ?? '',
-      iconName: json['iconName'] ?? 'medical',
       priority: json['priority'] ?? 1,
       videoUrl: json['videoUrl'] ?? '',
       illustrationUrl: json['illustrationUrl'] ?? '',
