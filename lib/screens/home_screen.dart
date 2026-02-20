@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../services/database_helper.dart';
+import '../services/json_data_service.dart';
+import '../models/category_model.dart';
 import 'category_detail_screen.dart';
 import 'search_screen.dart';
-import '../services/remote_service.dart';
-import '../config/remote_config.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,14 +14,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
+  final JsonDataService _jsonDataService = JsonDataService();
   final TextEditingController _searchController = TextEditingController();
-  List<String> categories = [];
+  List<CategoryModel> categories = [];
   bool isLoading = true;
-
-  // Mapping dari Supabase categories (jika tersedia)
-  final Map<String, IconData> _categoryIcons = {};
-  final Map<String, Color> _categoryColors = {};
 
   @override
   void initState() {
@@ -39,87 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _initialize() async {
-    await _syncFromSupabase();
-    // Coba ambil kategori dari Supabase; jika gagal/0 pakai lokal
-    final loadedRemote = await _loadRemoteCategories();
-    if (!loadedRemote) {
-      await _loadCategories();
-    }
-  }
-
-  Future<void> _syncFromSupabase() async {
-    try {
-      // Skip sync if Supabase is not configured yet
-      if (supabaseRestUrl.contains('YOUR_PROJECT') ||
-          supabaseAnonKey == 'YOUR_ANON_PUBLIC_KEY') {
-        return;
-      }
-      final remote = RemoteService();
-      final list = await remote.fetchAll();
-      if (list.isNotEmpty) {
-        await _databaseHelper.replaceAll(list);
-      } else {
-        // Keep existing local data if remote returns empty (e.g., due to RLS)
-        // debug: print message to help diagnose
-        // ignore: avoid_print
-        print('Supabase returned 0 rows; skipped replacing local DB');
-      }
-    } catch (e) {
-      // Ignore sync errors for now; app still works with local data
-      // ignore: avoid_print
-      print('Sync error: $e');
-    }
-  }
-
-  Future<bool> _loadRemoteCategories() async {
-    try {
-      // Jika Supabase belum dikonfigurasi, lewati
-      if (supabaseRestUrl.contains('YOUR_PROJECT') || supabaseAnonKey == 'YOUR_ANON_PUBLIC_KEY') {
-        return false;
-      }
-      final remote = RemoteService();
-      final list = await remote.fetchCategories();
-      if (list.isEmpty) {
-        return false;
-      }
-
-      final List<String> names = [];
-      final Map<String, IconData> icons = {};
-      final Map<String, Color> colors = {};
-
-      for (final Map<String, dynamic> row in list) {
-        final String name = (row['name'] ?? '').toString();
-        if (name.isEmpty) continue;
-        names.add(name);
-        final String? iconName = row['iconName']?.toString();
-        final String? colorStr = row['color']?.toString();
-        icons[name] = _iconFromName(iconName);
-        colors[name] = _colorFromString(colorStr) ?? _getDefaultCategoryColor(name);
-      }
-
-      if (names.isEmpty) return false;
-
-      setState(() {
-        categories = names;
-        _categoryIcons
-          ..clear()
-          ..addAll(icons);
-        _categoryColors
-          ..clear()
-          ..addAll(colors);
-        isLoading = false;
-      });
-      return true;
-    } catch (e) {
-      // ignore: avoid_print
-      print('Load remote categories failed: $e');
-      return false;
-    }
+    await _loadCategories();
   }
 
   Future<void> _loadCategories() async {
     try {
-      final cats = await _databaseHelper.getAllCategories();
+      final cats = _jsonDataService.categories;
       setState(() {
         categories = cats;
         isLoading = false;
@@ -128,123 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         isLoading = false;
       });
-    }
-  }
-
-  // Konversi string iconName -> IconData dengan fallback
-  IconData _iconFromName(String? iconName) {
-    final String key = (iconName ?? '').trim().toLowerCase();
-    switch (key) {
-      case 'accessibility':
-        return Icons.accessibility;
-      case 'bloodtype':
-        return Icons.bloodtype;
-      case 'local_fire_department':
-        return Icons.local_fire_department;
-      case 'psychology':
-        return Icons.psychology;
-      case 'warning':
-        return Icons.warning;
-      case 'flash_on':
-        return Icons.flash_on;
-      case 'medical_services':
-        return Icons.medical_services;
-      case 'healing':
-        return Icons.healing;
-      case 'health_and_safety':
-        return Icons.health_and_safety;
-      case 'vaccines':
-        return Icons.vaccines;
-      case 'sick':
-        return Icons.sick;
-      default:
-        return Icons.medical_services;
-    }
-  }
-
-  // Parse color string (#RRGGBB, RRGGBB, #AARRGGBB, AARRGGBB) -> Color
-  Color? _colorFromString(String? value) {
-    if (value == null) return null;
-    var v = value.trim();
-    if (v.isEmpty) return null;
-    // Hapus prefix seperti # atau 0x
-    v = v.replaceAll('#', '').replaceAll('0x', '').replaceAll('0X', '');
-    if (v.length == 6) {
-      v = 'FF$v';
-    }
-    if (v.length != 8) return null;
-    try {
-      final intColor = int.parse(v, radix: 16);
-      return Color(intColor << 0);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  Color _getCategoryColor(String category) {
-    // Gunakan warna dari Supabase jika ada
-    final Color? mapped = _categoryColors[category];
-    if (mapped != null) return mapped;
-    return _getDefaultCategoryColor(category);
-  }
-
-  Color _getDefaultCategoryColor(String category) {
-    switch (category) {
-      case 'Pendarahan':
-        return const Color(0xFFE53E3E); // Red
-      case 'Tulang dan Otot':
-        return const Color(0xFF38B2AC); // Teal
-      case 'Luka Bakar':
-        return const Color(0xFF3182CE); // Blue
-      case 'Cedera Kepala':
-        return const Color(0xFF6B46C1); // Purple
-      case 'Keracunan':
-        return const Color(0xFFDD6B20); // Orange
-      case 'Kejang':
-        return const Color(0xFF319795); // Teal
-      default:
-        return const Color(0xFF3182CE);
-    }
-  }
-
-  IconData _getCategoryIcon(String category) {
-    // Gunakan icon dari Supabase jika ada
-    final IconData? mapped = _categoryIcons[category];
-    if (mapped != null) return mapped;
-    switch (category) {
-      case 'Pendarahan':
-        return Icons.bloodtype;
-      case 'Tulang dan Otot':
-        return Icons.accessibility;
-      case 'Luka Bakar':
-        return Icons.local_fire_department;
-      case 'Cedera Kepala':
-        return Icons.psychology;
-      case 'Keracunan':
-        return Icons.warning;
-      case 'Kejang':
-        return Icons.flash_on;
-      default:
-        return Icons.medical_services;
-    }
-  }
-
-  String _getCategoryDescription(String category) {
-    switch (category) {
-      case 'Pendarahan':
-        return 'Masalah kesehatan terkait pendarahan dan luka';
-      case 'Tulang dan Otot':
-        return 'Masalah kesehatan terkait tulang, otot, dan sendi';
-      case 'Luka Bakar':
-        return 'Masalah kesehatan terkait luka bakar';
-      case 'Cedera Kepala':
-        return 'Masalah kesehatan terkait cedera kepala dan otak';
-      case 'Keracunan':
-        return 'Masalah kesehatan terkait keracunan dan overdosis';
-      case 'Kejang':
-        return 'Masalah kesehatan terkait kejang dan epilepsi';
-      default:
-        return 'Masalah kesehatan umum';
     }
   }
 
@@ -329,7 +132,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Colors.grey.shade400,
                             size: 20,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
                         ),
                         style: GoogleFonts.poppins(
                           fontSize: 14,
@@ -343,7 +147,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SearchScreen(initialQuery: value.trim()),
+                                builder: (context) =>
+                                    SearchScreen(initialQuery: value.trim()),
                               ),
                             );
                           }
@@ -366,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          
+
           // Hero Banner
           SliverToBoxAdapter(
             child: Container(
@@ -388,7 +193,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withValues(alpha: 0.85),
                                   Theme.of(context).colorScheme.primary,
                                 ],
                               ),
@@ -434,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          
+
           // Categories Section Header (Fixed, tidak ikut scroll)
           SliverPersistentHeader(
             pinned: true,
@@ -461,7 +269,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: 4,
                             height: 24,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE53E3E), // Red color for variety
+                              color: const Color(
+                                  0xFFE53E3E), // Red color for variety
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
@@ -493,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          
+
           // Categories Grid (Bisa di-scroll)
           isLoading
               ? const SliverToBoxAdapter(
@@ -507,7 +316,8 @@ class _HomeScreenState extends State<HomeScreen> {
               : SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
@@ -522,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-          
+
           // Bottom padding
           const SliverToBoxAdapter(
             child: SizedBox(height: 30),
@@ -532,13 +342,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoryCard(String category) {
+  Widget _buildCategoryCard(CategoryModel category) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CategoryDetailScreen(category: category),
+            builder: (context) => CategoryDetailScreen(category: category.name),
           ),
         );
       },
@@ -565,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: double.infinity,
               height: 80,
               decoration: BoxDecoration(
-                color: _getCategoryColor(category),
+                color: category.getColor(),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
@@ -573,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: Center(
                 child: Icon(
-                  _getCategoryIcon(category),
+                  category.getIcon(),
                   size: 32,
                   color: Colors.white,
                 ),
@@ -587,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      category,
+                      category.name,
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -599,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 8),
                     Expanded(
                       child: Text(
-                        _getCategoryDescription(category),
+                        category.description,
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           color: Colors.grey.shade600,
@@ -639,7 +449,8 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => maxHeight;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
     return SizedBox.expand(child: child);
   }
 

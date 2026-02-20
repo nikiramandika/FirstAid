@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'screens/home_screen.dart';
+import 'services/json_data_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await JsonDataService().loadData();
   runApp(const FirstAidApp());
 }
 
@@ -32,4 +35,4 @@ class FirstAidApp extends StatelessWidget {
       home: const HomeScreen(),
     );
   }
-} 
+}

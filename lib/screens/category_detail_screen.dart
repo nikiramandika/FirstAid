@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../services/database_helper.dart';
+import '../services/json_data_service.dart';
 import '../models/first_aid_data.dart';
 import 'detail_screen.dart';
 
@@ -17,7 +17,7 @@ class CategoryDetailScreen extends StatefulWidget {
 }
 
 class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
+  final JsonDataService _jsonDataService = JsonDataService();
   List<FirstAidData> items = [];
   bool isLoading = true;
 
@@ -29,7 +29,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
 
   Future<void> _loadCategoryItems() async {
     try {
-      final data = await _databaseHelper.getDataByCategory(widget.category);
+      final data = _jsonDataService.getDataByCategory(widget.category);
       setState(() {
         items = data;
         isLoading = false;
@@ -42,22 +42,11 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
   }
 
   Color _getCategoryColor(String category) {
-    switch (category) {
-      case 'Pendarahan':
-        return const Color(0xFFE53E3E); // Red
-      case 'Tulang dan Otot':
-        return const Color(0xFF38B2AC); // Teal
-      case 'Luka Bakar':
-        return const Color(0xFFE53E3E); // Red
-      case 'Cedera Kepala':
-        return const Color(0xFF6B46C1); // Purple
-      case 'Keracunan':
-        return const Color(0xFFDD6B20); // Orange
-      case 'Kejang':
-        return const Color(0xFF319795); // Teal
-      default:
-        return const Color(0xFFE53E3E);
+    final cat = _jsonDataService.getCategoryByName(category);
+    if (cat != null) {
+      return cat.getColor();
     }
+    return const Color(0xFFE53E3E);
   }
 
   Color _getPriorityColor(int priority) {
@@ -197,9 +186,11 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: _getPriorityColor(item.priority).withValues(alpha: 0.1),
+                        color: _getPriorityColor(item.priority)
+                            .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -255,4 +246,4 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       ),
     );
   }
-} 
+}

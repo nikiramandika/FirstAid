@@ -1,0 +1,168 @@
+{
+  "categories": [
+    {
+      "name": "Kondisi Kritis",
+      "color": "0xFFE53E3E",
+      "icon": "emergency",
+      "description": "Masalah kesehatan terkait kesadaran dan fungsi jantung [cite: 56, 65, 91]"
+    },
+    {
+      "name": "Pendarahan",
+      "color": "0xFFE53E3E",
+      "icon": "bloodtype",
+      "description": "Masalah kesehatan terkait pendarahan dan luka terbuka [cite: 127]"
+    },
+    {
+      "name": "Tulang dan Otot",
+      "color": "0xFF38B2AC",
+      "icon": "accessibility",
+      "description": "Masalah kesehatan terkait tulang, otot, dan sendi [cite: 162, 262]"
+    },
+    {
+      "name": "Luka Bakar",
+      "color": "0xFF3182CE",
+      "icon": "local_fire_department",
+      "description": "Masalah kesehatan terkait luka bakar [cite: 109]"
+    },
+    {
+      "name": "Cedera Kepala",
+      "color": "0xFF6B46C1",
+      "icon": "psychology",
+      "description": "Masalah kesehatan terkait cedera kepala dan tulang belakang [cite: 145]"
+    },
+    {
+      "name": "Keracunan dan Gigitan",
+      "color": "0xFFDD6B20",
+      "icon": "warning",
+      "description": "Masalah kesehatan terkait racun makanan dan gigitan hewan/serangga [cite: 185, 210, 248]"
+    },
+    {
+      "name": "Saluran Pernapasan",
+      "color": "0xFF319795",
+      "icon": "airway",
+      "description": "Masalah kesehatan terkait tersedak dan pernapasan [cite: 224]"
+    }
+  ],
+  "items": [
+    {
+      "id": 1,
+      "category": "Kondisi Kritis",
+      "title": "Korban Pingsan",
+      "description": "Memaksimalkan suplai oksigen ke otak dengan manipulasi peredaran darah [cite: 58]",
+      "treatment": "1. Hubungi 119[cite: 59].\n2. Pastikan lingkungan aman[cite: 59].\n3. Cek respon nyeri/panggilan[cite: 59].\n4. Jauhkan kerumunan[cite: 59].\n5. Longgarkan pakaian[cite: 59].\n6. Telentangkan korban dengan kaki lebih tinggi dari jantung[cite: 59].\n7. Miringkan kepala[cite: 59].",
+      "warnings": "Jangan dudukkan korban, jangan sering memindahkan korban, dan jangan beri air jika belum sadar penuh[cite: 59].",
+      "symptoms": "Terhambatnya suplai oksigen ke otak sehingga korban tidak sadar[cite: 58].",
+      "priority": 1
+    },
+    {
+      "id": 2,
+      "category": "Kondisi Kritis",
+      "title": "Henti Jantung (RJP)",
+      "description": "Resusitasi Jantung Paru untuk mengalirkan darah ke otak dan jantung [cite: 69]",
+      "treatment": "1. Pastikan aman[cite: 71].\n2. Cek respon kesadaran (panggil/tepuk/rangsang nyeri) [cite: 72-74].\n3. Jika tidak napas, hubungi 119 dan mulai RJP [cite: 75-76].\n4. Letakkan tumit tangan di tengah dada[cite: 78].\n5. Lakukan penekanan 5 cm dengan tempo 100-120 tekanan/menit[cite: 80].",
+      "warnings": "Pertahankan siku lurus dan lengan tegak lurus dengan dada korban[cite: 79].",
+      "symptoms": "Napas atau denyut jantung berhenti[cite: 68].",
+      "priority": 1
+    },
+    {
+      "id": 3,
+      "category": "Kondisi Kritis",
+      "title": "Penggunaan AED",
+      "description": "Menggunakan Automatic External Defibrillator untuk memicu denyut jantung [cite: 93, 95]",
+      "treatment": "1. Hubungi 119[cite: 96].\n2. Nyalakan AED dan ikuti instruksi suara[cite: 97].\n3. Pasang bantalan elektroda di dada[cite: 97].\n4. Tekan tombol kejutan jika diperintahkan alat[cite: 99].\n5. Baringkan pada posisi pemulihan jika korban bernapas[cite: 100].",
+      "warnings": "AED secara otomatis menilai irama jantung dan tidak memberikan kejutan jika tidak diperlukan[cite: 98, 99].",
+      "symptoms": "Korban henti jantung yang memerlukan bantuan pemicu denyut nadi[cite: 94, 95].",
+      "priority": 1
+    },
+    {
+      "id": 4,
+      "category": "Luka Bakar",
+      "title": "Luka Bakar",
+      "description": "Meredakan rasa sakit dan mengurangi dampak kerusakan jaringan [cite: 110]",
+      "treatment": "1. Hubungi 119[cite: 111].\n2. Jauhkan korban dari sumber api/listrik [cite: 112-115].\n3. Lepaskan aksesoris dan bagian pakaian yang terbakar[cite: 116].\n4. Dinginkan luka dengan air mengalir suhu ruangan[cite: 116].\n5. Bawa ke fasilitas kesehatan[cite: 117].",
+      "warnings": "JANGAN gunakan kopi, pasta gigi, atau bahan lain karena memperparah kondisi luka[cite: 119].",
+      "symptoms": "Nyeri dan kerusakan jaringan akibat panas/listrik[cite: 109, 110].",
+      "priority": 1
+    },
+    {
+      "id": 5,
+      "category": "Pendarahan",
+      "title": "Pendarahan Luar",
+      "description": "Menghentikan pendarahan hebat agar korban tidak kekurangan darah [cite: 128]",
+      "treatment": "1. Hubungi 119[cite: 130].\n2. Tekan luka kuat-kuat dengan tangan atau kain bersih[cite: 131].\n3. Jangan membuka balutan yang sudah ada, tambah tekanan jika perlu[cite: 132].\n4. Tinggikan anggota gerak (elevasi) melebihi jantung[cite: 133].\n5. Tekan pembuluh darah bagian atas jika pendarahan berlanjut[cite: 134].",
+      "warnings": "Waspadai tanda kurang darah seperti pucat, pusing, bibir biru, hingga pingsan[cite: 129].",
+      "symptoms": "Darah keluar dari luka, korban pusing, pucat, atau bibir biru[cite: 129].",
+      "priority": 1
+    },
+    {
+      "id": 6,
+      "category": "Cedera Kepala",
+      "title": "Cedera Kepala & Leher",
+      "description": "Penanganan trauma kepala untuk melindungi tulang belakang [cite: 146]",
+      "treatment": "1. Hubungi 119[cite: 148].\n2. Fiksasi posisi leher dengan ganjal di samping kiri dan kanan kepala[cite: 147].\n3. Longgarkan pakaian ketat di leher[cite: 149].\n4. Gunakan lipatan karton untuk 'Neck Collar' darurat[cite: 152].\n5. Pindahkan korban serentak sebagai satu unit oleh minimal 3 orang[cite: 156, 157].",
+      "warnings": "Jangan gerakkan leher dan jangan letakkan bantal di bawah leher korban[cite: 146, 147].",
+      "symptoms": "Dicurigai cedera tulang belakang (leher/punggung) akibat trauma[cite: 146].",
+      "priority": 1
+    },
+    {
+      "id": 7,
+      "category": "Tulang dan Otot",
+      "title": "Patah Tulang",
+      "description": "Stabilisasi bagian tubuh yang cedera untuk mencegah kerusakan lebih lanjut [cite: 169]",
+      "treatment": "1. Jangan gerakkan bagian yang cedera[cite: 169].\n2. Pasang bidai menggunakan papan atau karton kaku[cite: 171].\n3. Ikat bidai dengan hati-hati menggunakan kain/tali[cite: 171].\n4. Ikat area kaki jika dicurigai patah di kaki untuk mencegah gesekan[cite: 172].\n5. Segera bawa ke fasilitas kesehatan[cite: 173].",
+      "warnings": "Penolong tidak perlu mencoba meluruskan atau memperbaiki posisi tulang yang patah[cite: 170].",
+      "symptoms": "Rasa sakit, sulit digerakkan, bengkak, memar, atau perubahan bentuk pada daerah cedera [cite: 164-168].",
+      "priority": 1
+    },
+    {
+      "id": 8,
+      "category": "Keracunan dan Gigitan",
+      "title": "Tergigit Ular",
+      "description": "Mengurangi kecepatan penyebaran racun dan dampak yang ditimbulkan [cite: 186]",
+      "treatment": "1. Tenangkan korban dan minimalkan gerakan[cite: 192].\n2. Hubungi 119[cite: 193].\n3. Pasang bidai kaku jika gigitan terjadi pada anggota gerak[cite: 195].\n4. Miringkan tubuh korban jika terjadi muntah[cite: 197].\n5. Jangan sentuh ular secara langsung jika ular mati[cite: 198].",
+      "warnings": "JANGAN gunakan torniket, JANGAN sayat luka, JANGAN sedot racun, dan JANGAN beri es [cite: 187-203].",
+      "symptoms": "Bekas gigitan, rasa sakit, dan kemungkinan muntah[cite: 194, 197].",
+      "priority": 1
+    },
+    {
+      "id": 9,
+      "category": "Keracunan dan Gigitan",
+      "title": "Gigitan Serangga Beracun",
+      "description": "Penanganan sengatan untuk mengurangi penyebaran racun [cite: 211]",
+      "treatment": "1. Hubungi 119[cite: 213].\n2. Ambil sengat yang tertinggal dengan kuku, kartu plastik (ATM), atau pinset[cite: 216].\n3. Kompres dingin di area gigitan/sengatan[cite: 217].\n4. Tenangkan korban dan minimalkan gerakan[cite: 212].",
+      "warnings": "Perhatikan adanya tanda reaksi alergi seperti bengkak kemerahan dan gatal[cite: 215].",
+      "symptoms": "Bengkak kemerahan, gatal, atau tanda reaksi alergi lainnya[cite: 215].",
+      "priority": 2
+    },
+    {
+      "id": 10,
+      "category": "Saluran Pernapasan",
+      "title": "Tersedak",
+      "description": "Mengatasi penyumbatan saluran napas akibat benda asing [cite: 225]",
+      "treatment": "1. Hubungi 119[cite: 226].\n2. Berdiri di belakang korban, tempatkan satu kaki di antara kaki korban[cite: 229].\n3. Lingkarkan tangan di pinggang dan kepalkan tangan tepat di atas pusar [cite: 229-231].\n4. Tekan kuat dan cepat ke arah atas dan ke dalam[cite: 234].\n5. Lakukan berulang sampai objek keluar[cite: 235].",
+      "warnings": "Tanyakan 'apakah kamu tersedak?' untuk memastikan bantuan diperlukan[cite: 227].",
+      "symptoms": "Udara tidak bisa keluar atau masuk, korban memegang leher[cite: 225].",
+      "priority": 1
+    },
+    {
+      "id": 11,
+      "category": "Keracunan dan Gigitan",
+      "title": "Keracunan Makanan",
+      "description": "Penanganan gangguan kesehatan akibat makanan terkontaminasi [cite: 249]",
+      "treatment": "1. Baringkan korban pada posisi nyaman[cite: 251].\n2. Beri minum sedikit demi sedikit (oralit atau air kelapa)[cite: 252].\n3. Berikan makanan lunak dalam porsi sedikit[cite: 253].\n4. Jika gejala memberat, hubungi 119[cite: 254].",
+      "warnings": "KLB keracunan dapat menimbulkan korban jiwa jika tidak ditangani serius[cite: 250].",
+      "symptoms": "Mual, pusing, hingga muntah[cite: 250].",
+      "priority": 2
+    },
+    {
+      "id": 12,
+      "category": "Tulang dan Otot",
+      "title": "Terkilir / Keseleo",
+      "description": "Mengatasi cedera otot/sendi dengan metode RICE [cite: 265-273]",
+      "treatment": "1. Rest: Istirahatkan bagian cedera selama 48 jam[cite: 265, 266].\n2. Ice: Kompres es 15-20 menit setiap 2-3 jam selama 72 jam[cite: 267, 268].\n3. Compression: Balut tekan dengan perban elastis (tidak terlalu kencang)[cite: 270, 271].\n4. Elevation: Tinggikan lokasi cedera di atas ketinggian jantung[cite: 272, 273].",
+      "warnings": "JANGAN lakukan pemijatan pada daerah cedera untuk menghindari pendarahan dan bengkak[cite: 264].",
+      "symptoms": "Sakit, berdenyut, bengkak, dan terasa hangat[cite: 263].",
+      "priority": 2
+    }
+  ]
+}

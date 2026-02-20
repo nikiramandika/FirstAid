@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/first_aid_data.dart';
-import '../services/database_helper.dart';
+import '../services/json_data_service.dart';
 import 'detail_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   final String? initialQuery;
-  
+
   const SearchScreen({
     super.key,
     this.initialQuery,
@@ -17,7 +17,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
+  final JsonDataService _jsonDataService = JsonDataService();
   final TextEditingController _searchController = TextEditingController();
   List<FirstAidData> searchResults = [];
   List<FirstAidData> allData = [];
@@ -28,7 +28,7 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _loadAllData();
-    
+
     // Set initial query if provided
     if (widget.initialQuery != null) {
       _searchController.text = widget.initialQuery!;
@@ -36,12 +36,12 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  Future<void> _loadAllData() async {
+  void _loadAllData() {
     setState(() {
       isLoading = true;
     });
     try {
-      final data = await _databaseHelper.getAllData();
+      final data = _jsonDataService.items;
       setState(() {
         allData = data;
         isLoading = false;
@@ -68,15 +68,10 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     // Perform search
-    _databaseHelper.searchData(query).then((results) {
-      setState(() {
-        searchResults = results;
-        isLoading = false;
-      });
-    }).catchError((e) {
-      setState(() {
-        isLoading = false;
-      });
+    final results = _jsonDataService.searchData(query);
+    setState(() {
+      searchResults = results;
+      isLoading = false;
     });
   }
 
@@ -150,7 +145,8 @@ class _SearchScreenState extends State<SearchScreen> {
                               },
                             )
                           : null,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
                     ),
                     onChanged: _performSearch,
                     style: GoogleFonts.poppins(fontSize: 14),
@@ -260,7 +256,8 @@ class _SearchScreenState extends State<SearchScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: _getCategoryColor(item.category).withValues(alpha: 0.1),
+                  color:
+                      _getCategoryColor(item.category).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -390,7 +387,8 @@ class _SearchScreenState extends State<SearchScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: _getCategoryColor(item.category).withValues(alpha: 0.1),
+                    color:
+                        _getCategoryColor(item.category).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -447,41 +445,19 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Color _getCategoryColor(String category) {
-    switch (category) {
-      case 'Pendarahan':
-        return Colors.red.shade400;
-      case 'Tulang dan Otot':
-        return Colors.orange.shade400;
-      case 'Luka Bakar':
-        return Colors.deepOrange.shade400;
-      case 'Cedera Kepala':
-        return Colors.indigo.shade400;
-      case 'Keracunan':
-        return Colors.purple.shade400;
-      case 'Kejang':
-        return Colors.teal.shade400;
-      default:
-        return Colors.red.shade400;
+    final cat = _jsonDataService.getCategoryByName(category);
+    if (cat != null) {
+      return cat.getColor();
     }
+    return Colors.red.shade400;
   }
 
   IconData _getCategoryIcon(String category) {
-    switch (category) {
-      case 'Pendarahan':
-        return Icons.bloodtype;
-      case 'Tulang dan Otot':
-        return Icons.accessibility;
-      case 'Luka Bakar':
-        return Icons.local_fire_department;
-      case 'Cedera Kepala':
-        return Icons.psychology;
-      case 'Keracunan':
-        return Icons.warning;
-      case 'Kejang':
-        return Icons.flash_on;
-      default:
-        return Icons.medical_services;
+    final cat = _jsonDataService.getCategoryByName(category);
+    if (cat != null) {
+      return cat.getIcon();
     }
+    return Icons.medical_services;
   }
 
   @override
@@ -489,4 +465,4 @@ class _SearchScreenState extends State<SearchScreen> {
     _searchController.dispose();
     super.dispose();
   }
-} 
+}

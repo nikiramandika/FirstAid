@@ -44,9 +44,13 @@ class FirstAidData {
   }
 
   factory FirstAidData.fromMap(Map<String, dynamic> map) {
-    final dynamic iconNameVal = map['iconName'] ?? map['iconname'] ?? map['icon_name'];
-    final dynamic videoUrlVal = map['videoUrl'] ?? map['videourl'] ?? map['video_url'];
-    final dynamic illustrationUrlVal = map['illustrationUrl'] ?? map['illustrationurl'] ?? map['illustration_url'];
+    final dynamic iconNameVal =
+        map['iconName'] ?? map['iconname'] ?? map['icon_name'];
+    final dynamic videoUrlVal =
+        map['videoUrl'] ?? map['videourl'] ?? map['video_url'];
+    final dynamic illustrationUrlVal = map['illustrationUrl'] ??
+        map['illustrationurl'] ??
+        map['illustration_url'];
 
     return FirstAidData(
       id: map['id'],
@@ -60,6 +64,22 @@ class FirstAidData {
       priority: map['priority'] ?? 1,
       videoUrl: (videoUrlVal ?? '') as String,
       illustrationUrl: (illustrationUrlVal ?? '') as String,
+    );
+  }
+
+  factory FirstAidData.fromJson(Map<String, dynamic> json) {
+    return FirstAidData(
+      id: json['id'] ?? 0,
+      category: json['category'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      treatment: json['treatment'] ?? '',
+      warnings: json['warnings'] ?? '',
+      symptoms: json['symptoms'] ?? '',
+      iconName: json['iconName'] ?? 'medical',
+      priority: json['priority'] ?? 1,
+      videoUrl: json['videoUrl'] ?? '',
+      illustrationUrl: json['illustrationUrl'] ?? '',
     );
   }
 }
@@ -78,4 +98,4 @@ class FirstAidCategory {
     required this.color,
     this.itemCount = 0,
   });
-} 
+}
